@@ -67,11 +67,11 @@
       </b-col>
       <b-col cols="12" md="8">
         <div>
-          <h1>Table Data</h1>
+          <h1>Table Data {{excel_raw_data.sheet_names.length}}</h1>
           <b-card no-body>
             <b-tabs pills card>
               <b-tab
-                v-for="(exel, name, index) in exel_data_parsed"
+                v-for="(exel, name, index) in excel_raw_data.sheets"
                 :key="index"
                 :title="name"
                 active
@@ -100,9 +100,16 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 import XLSX from "xlsx";
 export default {
   components: {},
+  computed: {
+    ...mapState({
+      excel_raw_data: state => state.app.excel_raw_data
+    })
+  },
   methods: {
     onSubmit(evt) {
       evt.preventDefault();
@@ -210,20 +217,35 @@ export default {
   watch: {
     file(val) {
       if (!val) return;
-      if (this.previewImg) {
-        this.previewImg.remove();
-      }
-      const img = document.createElement("img");
-      img.classList.add("obj");
-      img.file = this.file;
-      this.previewImg = img;
-      this.$refs.preview.appendChild(img);
-
+      console.log(val);
+      let self = this;
       const fileReader = new FileReader();
-      fileReader.onload = e => {
-        this.previewImg.src = e.target.result;
+      fileReader.onload = function(e) {
+        var results,
+          data = e.target.result,
+          fixedData = self.fixdata(data);
+        let workbook = XLSX.read(btoa(fixedData), { type: "base64" });
+        console.log(workbook.SheetNames);
+        self.$store.commit("app/SET_SHEETNAMES", workbook.SheetNames);
+        self.$store.commit("app/SET_SHEETS", workbook.Sheets);
+        console.log(workbook);
+        console.log(results);
       };
-      fileReader.readAsDataURL(this.file);
+      fileReader.readAsArrayBuffer(this.file);
+      // if (this.previewImg) {
+      //   this.previewImg.remove();
+      // }
+      // const img = document.createElement("img");
+      // img.classList.add("obj");
+      // img.file = this.file;
+      // this.previewImg = img;
+      // this.$refs.preview.appendChild(img);
+
+      // const fileReader = new FileReader();
+      // fileReader.onload = e => {
+      //   this.previewImg.src = e.target.result;
+      // };
+      // fileReader.readAsDataURL(this.file);
     }
   }
 };
