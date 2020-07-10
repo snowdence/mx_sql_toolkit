@@ -9,6 +9,21 @@
         @dragenter="handleDragover"
       >Drop Here</div>
     </b-row>
+
+    <b-row>
+      <form class="mt-4">
+        <b-form-group id="fileInput">
+          <b-form-file v-model="file" placeholder="Drag and drop"></b-form-file>
+        </b-form-group>
+      </form>
+      <div class="mt-4" v-if="file">
+        <p>Name: {{ file.name }}</p>
+        <p>Size: {{ file.size }}</p>
+        <p>lastModified: {{ file.lastModified }}</p>
+        <p>Type: {{ file.type }}</p>
+      </div>
+      <div ref="preview" id="preview"></div>
+    </b-row>
     <b-row>
       <b-col cols="6" md="4">
         <h1>Data Options</h1>Upload File:
@@ -143,8 +158,7 @@ export default {
         i,
         f;
       for (i = 0, f = files[i]; i != files.length; ++i) {
-        var reader = new FileReader(),
-          name = f.name;
+        var reader = new FileReader();
         reader.onload = function(e) {
           var results,
             data = e.target.result,
@@ -152,9 +166,11 @@ export default {
             workbook = XLSX.read(btoa(fixedData), { type: "base64" }),
             firstSheetName = workbook.SheetNames[1],
             worksheet = workbook.Sheets[firstSheetName];
-          state.headers = get_header_row(worksheet);
+          console.log(workbook);
+          self.$store.state.app.headers = self.get_header_row(worksheet);
+
           results = XLSX.utils.sheet_to_json(worksheet);
-          state.tickets = results;
+          self.$store.state.app.tickets = results;
         };
         reader.readAsArrayBuffer(f);
       }
@@ -167,6 +183,9 @@ export default {
   },
   data() {
     return {
+      file: null,
+
+      tickets: "",
       exel_data_parsed: {
         HOC_SINH: {
           mssv: {},
@@ -187,6 +206,25 @@ export default {
       show: true,
       sql_text: "Default sql"
     };
+  },
+  watch: {
+    file(val) {
+      if (!val) return;
+      if (this.previewImg) {
+        this.previewImg.remove();
+      }
+      const img = document.createElement("img");
+      img.classList.add("obj");
+      img.file = this.file;
+      this.previewImg = img;
+      this.$refs.preview.appendChild(img);
+
+      const fileReader = new FileReader();
+      fileReader.onload = e => {
+        this.previewImg.src = e.target.result;
+      };
+      fileReader.readAsDataURL(this.file);
+    }
   }
 };
 </script>
@@ -201,5 +239,33 @@ export default {
   text-align: center;
   font: 20pt bold, "Vollkorn";
   color: #bbb;
+}
+
+#preview img {
+  max-width: 100%;
+}
+
+#fileInput.dragdrop .custom-file,
+#fileInput.dragdrop .custom-file-input {
+  height: 100px;
+}
+
+#fileInput.dragdrop .custom-file-label {
+  border: 0;
+  border: 5px dotted skyblue;
+  height: 100px;
+  line-height: 90px;
+  text-align: center;
+  color: skyblue;
+  padding: 0;
+}
+
+#fileInput.dragdrop .custom-file:hover .custom-file-label {
+  background: rgb(75, 181, 225);
+  color: #fff;
+}
+
+#fileInput.dragdrop .custom-file-label::after {
+  display: none;
 }
 </style>

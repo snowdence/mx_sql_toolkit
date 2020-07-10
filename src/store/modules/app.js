@@ -1,6 +1,6 @@
 const state = () => ({
-    items: [1, 2, 3],
-    checkoutStatus: null
+    headers:["Test header"],
+    tickets:[{name:"test"}],
 })
 
 const getters = {
