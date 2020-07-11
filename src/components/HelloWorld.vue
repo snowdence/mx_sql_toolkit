@@ -194,16 +194,7 @@ export default {
 
       tickets: "",
       exel_data_parsed: {
-        HOC_SINH: {
-          mssv: {},
-          name: {},
-          phone: {}
-        },
-        GIAO_VIEN: {
-          msgv: {},
-          name: {},
-          phone: {}
-        }
+        sheets: []
       },
       form: {
         database_name: "default",
@@ -228,6 +219,18 @@ export default {
         console.log(workbook.SheetNames);
         self.$store.commit("app/SET_SHEETNAMES", workbook.SheetNames);
         self.$store.commit("app/SET_SHEETS", workbook.Sheets);
+        workbook.SheetNames.forEach(function(item) {
+          let parsed = XLSX.utils.sheet_to_json(workbook.Sheets[item]);
+          self.exel_data_parsed.sheets[item] = parsed;
+          // Object.assign({},  self.exel_data_parsed.sheets,)
+        }); /* outputs:onetwothreefour*/
+        // for (let item in workbook.SheetNames) {
+        //   console.log(item);
+        //   let parsed = XLSX.utils.sheet_to_json(item);
+        //   console.log(parsed);
+        //   self.exel_data_parsed.sheets.push(parsed);
+        // }
+
         console.log(workbook);
         console.log(results);
       };
