@@ -1,14 +1,6 @@
 <template>
   <b-container class="bv-example-row">
     <!-- Stack the columns on mobile by making one full-width and the other half-width -->
-    <b-row>
-      <div
-        id="drop"
-        @drop="handleDrop"
-        @dragover="handleDragover"
-        @dragenter="handleDragover"
-      >Drop Here</div>
-    </b-row>
 
     <b-row>
       <form class="mt-4">
@@ -92,7 +84,7 @@
       </b-col>
       <b-form-textarea
         id="textarea"
-        v-model="sql_text"
+        :value="sql_text"
         placeholder="SQL ..."
         rows="10"
         max-rows="20"
@@ -109,13 +101,14 @@ export default {
   components: { ColumnContainer },
   computed: {
     ...mapState({
-      excel_raw_data: state => state.app.excel_raw_data
+      excel_raw_data: state => state.app.excel_raw_data,
+      sql_text: state => state.app.sql_text
     })
   },
   methods: {
     onSubmit(evt) {
       evt.preventDefault();
-      alert(JSON.stringify(this.form));
+      this.$store.commit("app/BUILD_SQL");
     },
     get_header_row(sheet) {
       var headers = [],
@@ -203,14 +196,14 @@ export default {
         check_go_cmd: true,
         date_exel_format: "dd/MM/yyyy"
       },
-      show: true,
-      sql_text: "Default sql"
+      show: true
     };
   },
+
   watch: {
     file(val) {
       if (!val) return;
-      console.log(val);
+
       let self = this;
       const fileReader = new FileReader();
       fileReader.onload = function(e) {
@@ -218,13 +211,14 @@ export default {
           data = e.target.result,
           fixedData = self.fixdata(data);
         let workbook = XLSX.read(btoa(fixedData), { type: "base64" });
-        console.log(workbook.SheetNames);
+        //console.log(workbook.SheetNames);
         self.$store.commit("app/SET_SHEETNAMES", workbook.SheetNames);
         self.$store.commit("app/SET_SHEETS", workbook.Sheets);
-        console.log("Excel json data");
-        console.log(self.$store.getters["app/excel_json_data"]);
+        //console.log("Excel json data");
+        //console.log(self.$store.getters["app/excel_json_data"]);
         //this.excel_raw_data = "Minhduc";
-        console.log(this.excel_raw_data);
+        //console.log(this.excel_raw_data);
+
         //console.log(self.$store.state.app.excel_raw_data);
         // for (let item in workbook.SheetNames) {
         //   console.log(item);
