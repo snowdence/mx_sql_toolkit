@@ -74,9 +74,11 @@
                 v-for="(exel, name, index) in excel_raw_data.sheets"
                 :key="index"
                 :title="name"
-                active
+                :active="false"
               >
-                <b-card-text>TABLE 1</b-card-text>
+                <b-card-text>
+                  <ColumnContainer :table_name="name" />
+                </b-card-text>
               </b-tab>
             </b-tabs>
           </b-card>
@@ -101,10 +103,10 @@
 
 <script>
 import { mapState } from "vuex";
-
+import ColumnContainer from "./ColumnContainter";
 import XLSX from "xlsx";
 export default {
-  components: {},
+  components: { ColumnContainer },
   computed: {
     ...mapState({
       excel_raw_data: state => state.app.excel_raw_data
@@ -219,11 +221,11 @@ export default {
         console.log(workbook.SheetNames);
         self.$store.commit("app/SET_SHEETNAMES", workbook.SheetNames);
         self.$store.commit("app/SET_SHEETS", workbook.Sheets);
-        workbook.SheetNames.forEach(function(item) {
-          let parsed = XLSX.utils.sheet_to_json(workbook.Sheets[item]);
-          self.exel_data_parsed.sheets[item] = parsed;
-          // Object.assign({},  self.exel_data_parsed.sheets,)
-        }); /* outputs:onetwothreefour*/
+        console.log("Excel json data");
+        console.log(self.$store.getters["app/excel_json_data"]);
+        //this.excel_raw_data = "Minhduc";
+        console.log(this.excel_raw_data);
+        //console.log(self.$store.state.app.excel_raw_data);
         // for (let item in workbook.SheetNames) {
         //   console.log(item);
         //   let parsed = XLSX.utils.sheet_to_json(item);
@@ -231,7 +233,7 @@ export default {
         //   self.exel_data_parsed.sheets.push(parsed);
         // }
 
-        console.log(workbook);
+        //console.log(workbook);
         console.log(results);
       };
       fileReader.readAsArrayBuffer(this.file);
