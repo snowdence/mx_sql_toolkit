@@ -28,7 +28,7 @@
           >
             <b-form-input
               id="input-db-name"
-              v-model="form.database_name"
+              v-model="sql_opt.database_name"
               type="text"
               required
               placeholder="Database Name"
@@ -43,14 +43,14 @@
           >
             <b-form-input
               id="input-date-format"
-              v-model="form.date_exel_format"
+              v-model="sql_opt.date_exel_format"
               type="text"
               required
               placeholder="Date Format Exel"
             ></b-form-input>
           </b-form-group>
           <b-form-checkbox
-            v-model="form.check_go_cmd"
+            v-model="sql_opt.check_go_cmd"
             class="mb-2 mr-sm-2 mb-sm-0"
           >Use 'Go" after any commands</b-form-checkbox>
 
@@ -102,7 +102,8 @@ export default {
   computed: {
     ...mapState({
       excel_raw_data: state => state.app.excel_raw_data,
-      sql_text: state => state.app.sql_text
+      sql_text: state => state.app.sql_text,
+      sql_opt: state => state.app.sql_opt
     })
   },
   methods: {
@@ -190,11 +191,6 @@ export default {
       tickets: "",
       exel_data_parsed: {
         sheets: []
-      },
-      form: {
-        database_name: "default",
-        check_go_cmd: true,
-        date_exel_format: "dd/MM/yyyy"
       },
       show: true
     };

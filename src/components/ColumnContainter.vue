@@ -3,7 +3,7 @@
     <b-row v-for="(col_data,index) in list_columns" :key="index">
       <b-col>
         <b-form-group>
-          <b-form-input :value="col_data.column_name"></b-form-input>
+          <b-form-input v-model="col_data.column_name"></b-form-input>
         </b-form-group>
       </b-col>
       <b-col>
@@ -24,13 +24,24 @@
           <b-form-checkbox v-model="col_data.can_null">Can NULL</b-form-checkbox>
         </b-form-group>
       </b-col>
+      <b-col>
+        <b-form-group>
+          <b-form-input v-model="col_data.foreign_relation"></b-form-input>
+        </b-form-group>
+      </b-col>
     </b-row>
   </b-container>
 </template>
 
 <script>
+import { mapActions } from "vuex";
+
 export default {
   props: ["table_name"],
+  methods: {
+    ...mapActions("app", ["ADD_COL_SCHEMAS_action"])
+  },
+
   data() {
     return {
       column_schema: [],
@@ -47,14 +58,18 @@ export default {
   watch: {
     list_columns: {
       handler(val) {
-        console.log(val);
+        //console.log(val);
         let table_name = this.table_name;
-        this.$store.commit("app/ADD_COL_SCHEMAS", {
+        this.ADD_COL_SCHEMAS_action({
           tb_name: table_name,
           tb_schemas: val
         });
+        // this.$store.commit("app/ADD_COL_SCHEMAS", {
+        //   tb_name: table_name,
+        //   tb_schemas: val
+        // });
 
-        console.log("Commit state " + this.table_name);
+        //console.log("Commit state " + this.table_name);
       },
       deep: true
     }
@@ -70,7 +85,8 @@ export default {
         primary: false,
         unique: false,
         auto_increament: false,
-        can_null: true
+        can_null: true,
+        foreign_relation: ""
       });
     });
   }

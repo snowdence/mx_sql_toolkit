@@ -60,6 +60,12 @@ const state = () => ({
     tickets: [{
         name: "test"
     }],
+    sql_opt: {
+        database_name: "default",
+        check_go_cmd: true,
+        date_exel_format: "dd/MM/yyyy"
+    },
+
     col_schemas: {},
     data_schemas: {},
     db_schemas: {
@@ -97,10 +103,18 @@ const getters = {
 }
 
 const actions = {
-
+    ADD_COL_SCHEMAS_action({ commit }, { tb_name, tb_schemas }) {
+        commit('ADD_COL_SCHEMAS', {
+            tb_name: tb_name,
+            tb_schemas: tb_schemas
+        })
+    }
 }
 
 const mutations = {
+    SET_SQL_OPT: (state, { key, value }) => {
+        Vue.set(state.sql_opt, key, value);
+    },
     SET_SQL_TEXT: (state, val) => {
         state.sql_text = val
     },
